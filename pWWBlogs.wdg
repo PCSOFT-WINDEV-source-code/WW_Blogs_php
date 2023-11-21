@@ -1,0 +1,211 @@
+#To edit and compare internal_properties, use WINDEV integrated tools.
+#Internal properties refer to the properties of controls in windows, reports, etc.
+info :
+ name : pWWBlogs
+ major_version : 28
+ minor_version : 0
+ type : 7
+ description : ""
+ subtype : 0
+procedure_set :
+ identifier : 0x1446562d0027842b
+ internal_properties : CAAAAAgAAABGLu41kG7fjQV3iS4F72qmnKaNh5694reolNKIW0iw
+ code_elements :
+  internal_properties : CAAAAAgAAAA1djDYXLib43/rsVqeKqcIwMy5V5llfvyAdbUtvF2Hd4u5YTfQK6J7w/pIEuDilrySxtnjCRO+psz9BcBi/cgAZOEkRw8lT4g4OOaBETNbnCRdeSIIGhbo9aZvO/jnzzl6CLQdc/JHs2eK69KW4LFqWYuovw==
+  type_code : 31
+  p_codes : []
+  procedures :
+   -
+     name : GenerateSession
+     procedure_id : 1461288529991348237
+     type_code : 15
+     code : |1+
+      // Summary: Used to generate an identifier for the session
+      // Syntax:
+      // GenerateSession ()
+      //
+      // Parameters:
+      //	None
+      // Return value:
+      // 	None
+      
+      Procédure GenerateSession()
+      
+      	// Generates a session identifier
+      	dtdhDateTimeCurrent is datetime = Today() + TimeSys()
+      	gsSession = dtdhDateTimeCurrent + TAB + Member.MemberID + "-" + Member.Nickname
+      
+      
+     type : 458752
+   -
+     name : CreationTestData
+     internal_properties : CAAAAAgAAACgy0yagyQowZYG2+XKuou+AzDEPDIvmU5UrqDFJYASHxKHIUxpdqQF3OR2SFbCFWoI8JQlluLhY0TwoX6ciCxRA3QKAmR+czLK4h6mkLkqETKvlbHpskfkoA1IgodA8pvXPt2vMPWZ0sR3UjlApOXMWS87PsRZHEM8cZC62S3zIopUhv6LOlnEqM0f/dCw6ekHSu2Akzg=
+     procedure_id : 1821986416150435800
+     type_code : 15
+     code : |1+
+      // Summary: Procedure that creates the test data in the MySQL "tables" (data files) 
+      // Syntax:
+      //[ <Result> = ] CreateTestData (<sFileName>)
+      //
+      // Parameters:
+      //	sFileName: Name of the sql file with its extension containing the queries to run
+      // Return value:
+      // 	boolean: False if failure
+      //
+      
+      Procédure CreationTestData(sFileName)
+      
+      sSQLFile is string = CompleteDir(fWebDir()) + CompleteDir("SQL") + sFileName
+      sSQLContent is string = fLoadText(sSQLFile)
+      //If no content is retrieved: no need to continue...
+      if sSQLContent ="" then 
+      	result False
+      end
+      
+      CreateTestData is data source
+      
+      //Retrieve each query to run
+      for each string sSQLQry of sSQLContent SEPARATED BY ";" + CR
+      	
+      	if sSQLQry <> "" and sSQLQry <> EOT then
+      		if HExecuteSQLQuery(CreateTestData, gcntMySQLconnection, hQueryWithoutCorrection,sSQLQry) = False then
+      			result False
+      		end
+      	end
+      	
+      end
+      
+      result True
+     type : 458752
+   -
+     name : DateTimeInLetter
+     procedure_id : 1965635845117364247
+     type_code : 15
+     code : |1-
+      Procédure DateTimeInLetter(dtDateTime)
+      
+      dPostDate is date
+      tPostTime is time
+      dtPostDateTime is datetime
+      
+      dtPostDateTime  = dtDateTime
+      dPostDate = dtPostDateTime..Date
+      tPostTime = dtPostDateTime..Time
+      
+      sDateTimeInLetter is string = "The " +  DateToDayInAlpha(dPostDate) + " " + dPostDate..Day + " " +...
+      DateToMonthInAlpha(dPostDate) + " " + dPostDate..Year +" at " +  TimeToString(tPostTime,"HH:MM")
+      
+      
+      result sDateTimeInLetter
+     type : 458752
+   -
+     name : FormatMessage
+     internal_properties : CAAAAAgAAAAAaFUZRoe44Q45PpC1OrHu+ybFm+QNdR083CA0P6/m366mll4t3jwQ1qQ1wrJvY8lgse8KpbkZfLOmkqR8PmL0x/OIdaSN+QXE05W5V793T4C7zMjEf2B/H4znL5Rd2bz2PdZGy/7OiZmE76DhAwCp1JIYoX/w12xhns1FIuqG/9oURqYXxMmkUj8h18q2L0TAylMyGZVP9+rBxyPI80/aeKrCHvbj
+     procedure_id : 1965636742769735926
+     type_code : 15
+     code : |1-
+      // Summary: Formats the message to get the proper styles
+      // Syntax:
+      //[ <Result> = ] FormatMessage (<sMessage>)
+      //
+      // Parameters:
+      //	sMessage: String to format
+      // Return value:
+      // 	Undefined type: Formatted message 
+      //
+      
+      Procédure FormatMessage(sMessage)
+      
+      // Replaces the CR characters
+      sMessage = Replace(sMessage, Charact(10), "<BR>" )
+      
+      // Replaces the tags for font size
+      sMessage = Replace(sMessage, "<SIZE=", "<FONT SIZE=")
+      sMessage = Replace(sMessage, "SIZE>", "FONT>")
+      
+      // Replaces the tags for font color
+      sMessage = Replace(sMessage, "<COLOR=", "<FONT COLOR=")
+      sMessage = Replace(sMessage, "COLOR>", "FONT>")
+      
+      // Quotes
+      sMessage = Replace(sMessage, "<QUOTE>", "<TABLE width=450 border=0 bgcolor=""#fafafa""><TR><TD style=""border:1px solid #cdcdcd""><p style=""font-size:9pt;word-wrap:break-word"">")
+      sMessage = Replace(sMessage, "</QUOTE>", "</p></TD></TR></TABLE>")
+      
+      // Deletes the script tags
+      nScriptPos is int
+      FOR ALL POSITION nScriptPos of "<script" in sMessage with IgnoreCase		
+      	nScriptEndPos is int		
+      	nScriptEndPos = Position(sMessage, "</script>", nScriptPos, IgnoreCase)		
+      	sMessage[[nScriptPos to nScriptEndPos + 9]] = ""		
+      end
+      
+      // Global Style
+      sMessage = "<span class=""PostText"">" + sMessage + "</span>"	
+      
+      
+      result sMessage
+     type : 458752
+   -
+     name : ColorOfMonth
+     procedure_id : 2060528792399482630
+     type_code : 15
+     code : |1+
+      // Summary: Returns the color corresponding to a month
+      // Syntax:
+      //[ <Result> = ] ColorOfMonth (<nMonth> is int)
+      //
+      // Parameters:
+      //	nMonth (integer): <specify the role of nMonth>
+      // Return value:
+      // 	integer: // 	None
+      //
+      // Example:
+      // Indicate an example.
+      //
+      Procédure ColorOfMonth(nMonth is int)
+      
+      nColor is int
+      
+      switch nMonth
+      	case 1
+      		nColor = RGB(64,163,240)
+      	case 2
+      		nColor = RGB(225,99,167)
+      	case 3
+      		nColor = RGB(202,204,44)
+      	case 4
+      		nColor = RGB(91,228,127)
+      	case 5
+      		nColor = RGB(228,91,91)
+      	case 6
+      		nColor = RGB(101,122,214)
+      	case 7
+      		nColor = RGB(191,214,101)
+      	case 8
+      		nColor = RGB(214,101,213)
+      	case 9
+      		nColor = RGB(240,144,64)
+      	case 10
+      		nColor = RGB(83,175,90)
+      	case 11
+      		nColor = RGB(96,158,157)
+      	case 12
+      		nColor = RGB(200,175,175)
+      	other case
+      		nColor = RGB(240,144,64)
+      end
+      
+      result nColor
+      
+     type : 458752
+  procedure_templates : []
+  property_templates : []
+ code_parameters :
+  internal_properties : CAAAAAgAAACVGQgYbalU7DKC3oH4ItDrjtcTHXXV/EuH8q0IbhyQlw==
+  original_name : COL_Collection1
+resources :
+ string_res :
+  identifier : 0x144651de001fae3b
+  internal_properties : CAAAAAgAAACm76HWfKGWp33VjXInA4cRlqArlgTTA862QGt72W2ld5Y=
+custom_note :
+ internal_properties : CAAAAAgAAABtB9HWVzrXO2+4NDRVK0vmzaNKrCKqH1DBX30lMmGZ

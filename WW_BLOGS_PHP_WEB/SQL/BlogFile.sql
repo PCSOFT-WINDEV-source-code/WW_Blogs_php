@@ -1,0 +1,1 @@
+insert into blog (BlogID,Name,MemberID) values (1,'My first blog',1);

@@ -1,0 +1,1 @@
+insert into Member (MemberID,Nickname,Email,Session,Password) values (1,'Administrator','administrator@email.com','MjAwNjA1MjQxMTIzMzYxNzAJMQ-John','demo');
